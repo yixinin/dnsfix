@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/eiannone/keyboard"
 
 	"github.com/miekg/dns"
 )
@@ -62,6 +65,17 @@ func main() {
 	hostsNew := ReplaceHosts(hostsOld, localDns.String())
 	saveHosts(config.HostPaths, hostsNew)
 	flushDns()
+	fmt.Println("speedup success. press any key to exit...")
+
+	go func() {
+		_, _, err := keyboard.GetSingleKey()
+		if err != nil {
+			panic(err)
+		}
+		os.Exit(0)
+	}()
+
+	time.Sleep(30 * time.Second)
 }
 
 type A struct {
