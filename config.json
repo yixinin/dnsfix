@@ -2,28 +2,12 @@
     "hostsPath": "C:\\Windows\\System32\\drivers\\etc\\hosts",
     "domains": [
         "github.com",
-        "nodeload.github.com",
-        "codeload.github.com",
-        "training.github.com",
-        "assets-cdn.github.com",
-        "documentcloud.github.com",
-        "help.github.com",
-        "githubstatus.com",
-        "github.global.ssl.fastly.net",
-        "raw.github.com",
         "raw.githubusercontent.com",
-        "cloud.githubusercontent.com",
-        "gist.githubusercontent.com",
-        "marketplace-screenshots.githubusercontent.com",
-        "repository-images.githubusercontent.com",
-        "user-images.githubusercontent.com",
-        "desktop.githubusercontent.com"
+        "www.microsoft.com",
+        "www.xbox.com",
+        "www.live.com"
     ],
     "dnss": [
-        [
-            "114.114.114.114",
-            "114.114.115.115"
-        ],
         [
             "8.8.8.8",
             "8.8.4.4"

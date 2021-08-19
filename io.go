@@ -22,16 +22,17 @@ func readHosts(path string) string {
 	return string(buf)
 }
 
-func saveHosts(path, content string) {
+func saveHosts(path, content string) error {
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0766)
 	if err != nil {
 		log.Printf("open %s buffer error:%v", path, err)
-		return
+		return err
 	}
 	_, err = io.WriteString(f, content)
 	if err != nil {
 		log.Printf("write error:%v\n", err)
 	}
+	return err
 }
 
 func readConfig(path string) Config {

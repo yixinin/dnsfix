@@ -15,8 +15,10 @@ import (
 )
 
 var configPath string
+var msg string
 
 func main() {
+	defer WaitExit()
 	flag.Parse()
 	if len(flag.Args()) > 0 {
 		configPath = flag.Args()[0]
@@ -48,24 +50,45 @@ func main() {
 	wg.Wait()
 	close(ch)
 
-	var localDns strings.Builder
+	var localDnsSb strings.Builder
 
 	for addr, a := range as {
 		if len(a) == 0 {
 			continue
 		}
 		sort.Sort(a)
-		localDns.WriteString(fmt.Sprintf("%s\t%s\t# %d\n", a[0].Ip, addr, a[0].Ttl))
+		localDnsSb.WriteString(fmt.Sprintf("%s\t%s\t# %d\n", a[0].Ip, addr, a[0].Ttl))
+	}
+
+	var localDnsText = localDnsSb.String()
+	if localDnsText == "" {
+		msg = "all dns detete failed"
+		return
 	}
 	hostsOld := readHosts(config.HostPaths)
 	if hostsOld == "" {
-		fmt.Println("hosts empty")
+		msg = "read hosts fail"
 		return
 	}
-	hostsNew := ReplaceHosts(hostsOld, localDns.String())
-	saveHosts(config.HostPaths, hostsNew)
-	flushDns()
-	fmt.Println("speedup success. press any key to exit...")
+
+	hostsNew := ReplaceHosts(hostsOld, localDnsText)
+	if err := saveHosts(config.HostPaths, hostsNew); err != nil {
+		msg = "write hosts fail, need admin permission"
+		return
+	}
+	if err := flushDns(); err != nil {
+		fmt.Println(err)
+		msg = "flush dns fail"
+		return
+	}
+
+	if msg == "" {
+		msg = "update hosts success. "
+	}
+}
+
+func WaitExit() {
+	fmt.Println(msg + "\n press any key to exit... or exit after 30 seconds.")
 
 	go func() {
 		_, _, err := keyboard.GetSingleKey()
@@ -108,14 +131,11 @@ func dnsQuery(ch chan A, wg *sync.WaitGroup, domain string, dnsIp string) {
 		record, isType := ans.(*dns.A)
 		if isType {
 			ip := record.A.String()
-			min, max, avg := pingTtl(ip)
-			if avg == 0 {
-				fmt.Println(min, max)
-			}
-			if avg == 1000*1000*1000 {
+			_, _, avg := pingTtl(ip)
+			if avg == DefaultMaxNanoSeconds {
+				fmt.Println(domain, ip, "no response")
 				return
 			}
-
 			ch <- A{
 				Ip:     ip,
 				Ttl:    avg,
