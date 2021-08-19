@@ -1,4 +1,4 @@
-module speedup
+module dnsfix
 
 go 1.16
 
