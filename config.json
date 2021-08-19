@@ -1,5 +1,4 @@
 {
-    "hostsPath": "C:\\Windows\\System32\\drivers\\etc\\hosts",
     "domains": [
         "github.com",
         "nodeload.github.com",

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -17,6 +18,8 @@ import (
 var configPath string
 var msg string
 
+var goos string
+
 func main() {
 	defer WaitExit()
 	flag.Parse()
@@ -25,6 +28,9 @@ func main() {
 	} else {
 		configPath = "./config.json"
 	}
+
+	goos = runtime.GOOS
+	fmt.Println(goos)
 
 	var config = readConfig(configPath)
 	var ch = make(chan A)
@@ -65,14 +71,14 @@ func main() {
 		msg = "all dns detete failed"
 		return
 	}
-	hostsOld := readHosts(config.HostPaths)
+	hostsOld := readHosts()
 	if hostsOld == "" {
 		msg = "read hosts fail"
 		return
 	}
 
 	hostsNew := ReplaceHosts(hostsOld, localDnsText)
-	if err := saveHosts(config.HostPaths, hostsNew); err != nil {
+	if err := saveHosts(hostsNew); err != nil {
 		msg = "write hosts fail, need admin permission"
 		return
 	}

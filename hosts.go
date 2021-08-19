@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -21,7 +22,18 @@ func ReplaceHosts(old string, content string) string {
 }
 
 func flushDns() error {
-	cmd := exec.Command("ipconfig", "/flushdns")
+	var cmd *exec.Cmd
+	switch goos {
+	case "windows":
+		cmd = exec.Command("ipconfig", "/flushdns")
+	case "linux":
+		cmd = exec.Command("service", "network", "restart")
+	case "darwin":
+		cmd = exec.Command("killall", "-HUP", "mDNSResponder")
+	default:
+		return errors.New("unknown os, ignore dns flush")
+	}
+
 	buf, err := cmd.CombinedOutput()
 
 	fmt.Printf("%s \n", buf)

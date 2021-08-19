@@ -2,18 +2,27 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"os"
 )
 
 type Config struct {
-	Dnss      [][]string `json:"dnss"`
-	Domains   []string   `json:"domains"`
-	HostPaths string     `json:"hostsPath"`
+	Dnss    [][]string `json:"dnss"`
+	Domains []string   `json:"domains"`
 }
 
-func readHosts(path string) string {
+func readHosts() string {
+	var path string
+	switch goos {
+	case "windows":
+		path = "C:\\Windows\\System32\\drivers\\etc\\hosts"
+	case "linux", "darwin":
+		path = "/etc/hosts"
+	default:
+		return ""
+	}
 	buf, err := os.ReadFile(path)
 	if err != nil {
 		log.Printf("read %s buffer error:%v\n", path, err)
@@ -22,7 +31,16 @@ func readHosts(path string) string {
 	return string(buf)
 }
 
-func saveHosts(path, content string) error {
+func saveHosts(content string) error {
+	var path string
+	switch goos {
+	case "windows":
+		path = "C:\\Windows\\System32\\drivers\\etc\\hosts"
+	case "linux", "darwin":
+		path = "/etc/hosts"
+	default:
+		return errors.New("unknown os")
+	}
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0766)
 	if err != nil {
 		log.Printf("open %s buffer error:%v", path, err)
