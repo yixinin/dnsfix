@@ -7,8 +7,8 @@ import (
 )
 
 func ReplaceHosts(old string, content string) string {
-	var startText = "### start speedup"
-	var endText = "### end speedup"
+	var startText = "### start dnsfix"
+	var endText = "### end dnsfix"
 	var start = strings.Index(old, startText)
 	var end = strings.Index(old, endText)
 	if start <= 0 || end <= 0 {
