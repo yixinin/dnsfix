@@ -33,6 +33,10 @@ func main() {
 	fmt.Println(goos)
 
 	var config = readConfig(configPath)
+	if len(config.Dnss) == 0 || len(config.Domains) == 0 {
+		fmt.Println("no configs")
+		return
+	}
 	var ch = make(chan A)
 	var wg sync.WaitGroup
 
