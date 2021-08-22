@@ -72,7 +72,7 @@ func main() {
 
 	var localDnsText = localDnsSb.String()
 	if localDnsText == "" {
-		msg = "all dns detete failed"
+		msg = "all dns detect failed"
 		return
 	}
 	hostsOld := readHosts()
